@@ -36,9 +36,9 @@ Sample app creates a Task to <u>execute</u> on a LWM2M connected client.
 
 ### <u>Overview:</u>
 
-1. Create a Device Type (or use one you already own) from your [Developer Dashboard](#Resources).   Then Enable <u>[Device Management Properties](#Resources)</u> for your Device Type.   
+1. Create a Device Type (or use one you already own) from your [Developer Dashboard](#resources).   Then Enable <u>[Device Management Properties](#resources)</u> for your Device Type.   
 
-   *Note: You can do this in the [Device Type Dashboard](#Resources)—> Select Your Device Type —> Select Device Management —> <u>Enable Device Properties</u>*
+   *Note: You can do this in the [Device Type Dashboard](#resources)—> Select Your Device Type —> Select Device Management —> <u>Enable Device Properties</u>*
 
 2. Build the LWM2M Client (this tutorial uses the C client provided below in the reference section) if you haven't already. 
    *Note: The ARTIK Cloud LWM2M Client is available in the resource section at the bottom of this documentation as well at the build instructions.*
@@ -84,7 +84,7 @@ Sample app creates a Task to <u>execute</u> on a LWM2M connected client.
 
    4. <u>User_Token</u> — User Token that of user that owns the device.   
 
-      *The User Access Token is obtained by OAuth2.   For convenience you can retrieve a user token by logging into the [API-Console](#Resources).  After logging in — make any request (ie:  /users/self) endpoint and use the Bearer Token shown in the Request Headers:*
+      *The User Access Token is obtained by OAuth2.   For convenience you can retrieve a user token by logging into the [API-Console](#resources).  After logging in — make any request (ie:  /users/self) endpoint and use the Bearer Token shown in the Request Headers:*
 
       ```
       {
@@ -139,13 +139,15 @@ Sample app creates a Task to <u>execute</u> on a LWM2M connected client.
    ```
    ##### Familiarize yourself with the following properties will help you build your TaskRequest:
 
-- <u>taskType</u> - this can be either "R", "W", "E" (i.e.: Read, Write, Execute).    Check more about the resource operations that are available in the [table below](#Resources)
+- <u>taskType</u> - this can be either "R", "W", "E" (i.e.: Read, Write, Execute).    Check more about the resource operations that are available in the [table below](#resources)
 - <u>property</u> - dotted-json-notation string of the device or server property being worked on.
 - <u>taskParameters.value</u> - value to 'set' on the <u>property</u> indicated.   
 - <u>dtid</u> - device type id for device type enabled for device managment.
 - <u>dids</u> - you may pass a list of device id's if you want to apply the task across multiple devices.
 
 ### <u>Supported Objects and Resources</u>
+
+Resource table below are provided for convenience.   Check for the latest information from our [LWM2M documentation](https://developer.artik.cloud/documentation/advanced-features/manage-devices-using-lwm2m.html).
 
 #### **<u>Object 3</u>**  —  <u>device</u> resources
 
@@ -188,9 +190,6 @@ Sample app creates a Task to <u>execute</u> on a LWM2M connected client.
 | 6            | PkgName                  | pkgName                  | String  | String           | Single    | R           |
 | 7            | PkgVersion               | pkgVersion               | String  | String           | Single    | R           |
 
-This table of device resources are provided below grabbed from our [LWM2M documentation](https://developer.artik.cloud/documentation/advanced-features/manage-devices-using-lwm2m.html).
-
-
 
 ### <u>Resources</u>
 
@@ -217,8 +216,24 @@ This table of device resources are provided below grabbed from our [LWM2M docume
 - **Device Type —> Device Management —> Properties**:  Enable Server and Device Properties for Device Management
 - **Device Type —> Device Management —> Tasks**:  View Task Status
 
+More about ARTIK Cloud
+----------------------
 
+If you are not familiar with ARTIK Cloud, we have extensive documentation at https://developer.artik.cloud/documentation
 
+The full ARTIK Cloud API specification can be found at https://developer.artik.cloud/documentation/api-reference/
 
+Check out advanced sample applications at https://developer.artik.cloud/documentation/samples/
+
+To create and manage your services and devices on ARTIK Cloud, create an account at https://developer.artik.cloud
+
+Also see the ARTIK Cloud blog for tutorials, updates, and more: http://artik.io/blog/cloud
+
+License and Copyright
+---------------------
+
+Licensed under the Apache License. See [LICENSE](https://github.com/artikcloud/artikcloud-java/blob/master/LICENSE).
+
+Copyright (c) 2017 Samsung Electronics Co., Ltd.
 
 *Internal Reference: /DX-754*
