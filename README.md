@@ -1,5 +1,10 @@
 ## Sample application interacting with <u>**ARTIK Cloud Device Management API**</u>: Create <u>Tasks</u> for connected <u>LWM2M Clients</u>
 
+### <u>Requirements:</u>
+- ARTIK Cloud Java SDK version >= 2.0.7+
+- LWM2M client
+- Java version >= 7
+
 ### <u>Introduction:</u>
 
 - Overview of ARTIK Cloud <u>Device Management API</u> for creating <u>Tasks</u> with read/write/execute operations.
@@ -30,7 +35,7 @@ Sample app creates a Task to <u>execute</u> on a LWM2M connected client.
 ### <u>Setup:</u>
 
 - Clone this sample application if you haven't already and setup project in your favorite IDE.
-- Clone and build the [ARTIK Cloud Java SDK](https://github.com/artikcloud/artikcloud-java) and import the libraries into your project.
+- Clone and build the [ARTIK Cloud Java SDK](https://github.com/artikcloud/artikcloud-java) and import the libraries into your project.  For convenience, you can also [download the binary jar file](https://search.maven.org).  Search for 'ARTIK Cloud', then download and import (jar-with-dependencies.jar) into your project.  
 - Clone and build LWM2M client application (this sample uses the C client provided below).
 - Follow the <u>Overview</u> instructions provided below.
 
