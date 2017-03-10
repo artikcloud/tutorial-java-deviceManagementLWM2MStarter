@@ -1,6 +1,6 @@
 package quickstart.sample;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,98 +11,117 @@ import cloud.artik.client.ApiException;
 import cloud.artik.model.TaskEnvelope;
 import cloud.artik.model.TaskParameters;
 import cloud.artik.model.TaskRequest;
-import cloud.artik.model.TaskStatusesEnvelope;
-import quickstart.devicemanagment.ClientHelper;
-import quickstart.devicemanagment.Config;
 
 public class QuickStartTasks {
 	
-	public static void main (String args[]) throws ApiException {
+	/**
+	 * A connected LWM2M device will receive the tasks that are issued below.
+	 * 
+	 * Visit the ARTIK Cloud device management dashboard to view your task statuses:
+	 * https://developer.artik.cloud/dashboard/devicetypes/your_device_type_id/devices
+	 * 
+	 */
 	
-		// User Token is required for this sample.
+	public static void main (String args[]) {
+	
+		/** user access token will be require to run this sample */
 		ApiClient apiClient = null;
 		ClientHelper.initClient(apiClient, Config.USER_TOKEN);
 		
+		/** initialize device management api service **/
 		DevicesManagementApi devicesManagementApi = new DevicesManagementApi();
-		Boolean includeTimestamp = false;
 		
-		//Callback for calling TaskRequest Async sample calls
-		ApiCallback<TaskEnvelope> callback = new ApiCallback<TaskEnvelope>() {
+		/** Response handler for calling our async api calls */
+		ApiCallback<TaskEnvelope> taskAsyncCallback = taskAsyncHandler();
+		
+		
+		/** Here we instantiate 3 TaskRequest instances */
+		TaskRequest readDevicePropertiesTask = new TaskRequest();
+		TaskRequest writeDeviceTaskRequest = new TaskRequest();
+		TaskRequest executeRebootTaskRequest = new TaskRequest();
 
+		
+		/** Build the 'read' TaskRequest with the following properties 
+		 * - here we read properties from device to ARTIK Cloud*/
+		readDevicePropertiesTask.dtid(Config.DEVICE_TYPE_ID);
+		readDevicePropertiesTask.dids(Arrays.asList(Config.DEVICE_IDS));
+		readDevicePropertiesTask.taskType("R");
+		readDevicePropertiesTask.setProperty("deviceProperties.device");
+		
+
+		/** Create 'write' TaskRequest with the following properties 
+		 * - here we write to the timezone property */
+		writeDeviceTaskRequest.dtid(Config.DEVICE_TYPE_ID);
+		writeDeviceTaskRequest.dids(Arrays.asList(Config.DEVICE_IDS));
+		writeDeviceTaskRequest.taskType("W");
+		writeDeviceTaskRequest.setProperty("deviceProperties.device.timezone");
+		writeDeviceTaskRequest.taskParameters(new TaskParameters().value("America/Los_Angeles"));
+		
+		
+		/** Create 'execute' TaskRequet with the following properties 
+		 * - here we execute reboot on the device */
+		executeRebootTaskRequest.dtid(Config.DEVICE_TYPE_ID);
+		executeRebootTaskRequest.dids(Arrays.asList(Config.DEVICE_IDS));
+		executeRebootTaskRequest.taskType("E");
+		executeRebootTaskRequest.setProperty("deviceProperties.device.reboot");
+				
+		/** Make the async call for the 3 Tasks we created earlier */
+		try {
+			devicesManagementApi.createTasksAsync(readDevicePropertiesTask, taskAsyncCallback);
+			devicesManagementApi.createTasksAsync(writeDeviceTaskRequest, taskAsyncCallback);
+			devicesManagementApi.createTasksAsync(executeRebootTaskRequest, taskAsyncCallback);
+		} catch (ApiException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		/** Commented out demonstrating blocking calls for above */
+		//TaskEnvelope taskEnvelope = devicesManagementApi.createTasks(readDevicePropertiesTask); 
+		//TaskEnvelope taskEnvelope = devicesManagementApi.createTasks(writeDeviceTaskRequest); 
+		//TaskEnvelope taskEnvelope = devicesManagementApi.createTasks(executeRebootTaskRequest); 
+
+	}
+	
+
+	public static ApiCallback<TaskEnvelope> taskAsyncHandler() {
+		
+		return new ApiCallback<TaskEnvelope>() {
+			
 			@Override
 			public void onDownloadProgress(long arg0, long arg1, boolean arg2) {
 				// TODO Auto-generated method stub
-				
 			}
-
+			
+			
+			/** failure handler */
 			@Override
-			public void onFailure(ApiException arg0, int arg1, Map<String, List<String>> arg2) {
-				// TODO Auto-generated method stub
+			public void onFailure(ApiException apiException, int arg1, Map<String, List<String>> headers) {
 				
-				System.out.println("From callback error:" + arg0);
-				System.out.println("Additional error info:" + arg0.getResponseBody());
-				System.out.println("Failure arg2:" + arg2);
+				System.out.println("ApiException:" + apiException);
+				System.out.println("Additional error info:" + apiException.getResponseBody());
+				System.out.println("Headers:" + headers);
 				
 			}
-
+			
+			/** success handler **/
 			@Override
-			public void onSuccess(TaskEnvelope arg0, int arg1, Map<String, List<String>> arg2) {
-				// TODO Auto-generated method stub
+			public void onSuccess(TaskEnvelope response, int arg1, Map<String, List<String>> headers) {
 				
-				System.out.println("From callback success TaskEnvelope:" + arg0);
-				System.out.println("===>Addtional Success data:" + arg0.getData());
-				System.out.println("Success arg2:" + arg2);
+				System.out.println("Response:" + response);
+				System.out.println("Headers:" + headers);
 				
 			}
-
+			
 			@Override
 			public void onUploadProgress(long arg0, long arg1, boolean arg2) {
 				// TODO Auto-generated method stub
 				
 			}
+
 			
 		};
-		
-		//add devices the task will operate on
-		List<String> dids = new ArrayList<String>();
-		dids.add(Config.DEVICE_ID);
-		
-		//read
-		TaskRequest readTask = new TaskRequest();
-		readTask.dtid(Config.DEVICE_TYPE_ID);
-		readTask.dids(dids);
-		readTask.taskType("R");
-		readTask.setProperty("deviceProperties.device");  		//set to read all properties from device
-		devicesManagementApi.createTasksAsync(readTask, callback);  // async sample call
-		TaskEnvelope taskEnvelope = devicesManagementApi.createTasks(readTask);  //creates the task
-		System.out.println(taskEnvelope);
-
 	
-		//view the task status
-		//getStatus(taskid, count, offset, status, deviceid)
-		TaskStatusesEnvelope taskStatusEnvelope = devicesManagementApi
-				.getStatuses(taskEnvelope.getData().getId(), 100, 0, "REQUESTED", Config.DEVICE_ID);
-		
-		System.out.println("Status Envelope:" + taskStatusEnvelope);
-		
-		//task write operation sample
-		TaskRequest writeDeviceTaskRequest = new TaskRequest();
-		writeDeviceTaskRequest.dtid(Config.DEVICE_TYPE_ID);
-		writeDeviceTaskRequest.dids(dids);
-		writeDeviceTaskRequest.taskType("W");
-		writeDeviceTaskRequest.setProperty("deviceProperties.device.timezone");
-		writeDeviceTaskRequest.taskParameters(new TaskParameters().value("Pacific/California"));
-		
-		devicesManagementApi.createTasksAsync(writeDeviceTaskRequest, callback);
-		
-		
-		//task execute operation sample
-		TaskRequest rebootTaskRequest = new TaskRequest();
-		rebootTaskRequest.dtid(Config.DEVICE_TYPE_ID);
-		rebootTaskRequest.dids(dids);
-		rebootTaskRequest.taskType("E");
-		rebootTaskRequest.setProperty("deviceProperties.device.reboot");
-		devicesManagementApi.createTasksAsync(rebootTaskRequest, callback);
 	}
-
+	
 }

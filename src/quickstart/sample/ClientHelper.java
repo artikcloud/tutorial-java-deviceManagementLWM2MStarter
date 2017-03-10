@@ -1,4 +1,4 @@
-package quickstart.devicemanagment;
+package quickstart.sample;
 
 import cloud.artik.client.ApiClient;
 import cloud.artik.client.Configuration;
