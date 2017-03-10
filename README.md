@@ -1,13 +1,13 @@
 ## <u>**Device Management API**</u>: Create a Task for <u>lwm2m clients</u>
 
-This sample app will create a  `TaskRequest` to ARTIK Cloud using the `DevicesManagement Task API`. 
+This sample app will create a TaskRequest to ARTIK Cloud using the DevicesManagement Task API. 
 
-The TaskRequests will be immediately scheduled to `ARTIK Cloud` and will act on any connected LWM2M clients.
+The TaskRequests will be immediately scheduled to ARTIK Cloud and will act on any connected LWM2M clients.
 
 ## <u>Requirements:</u>
 
-- Import to project [ARTIK Cloud Java SDK ](https://github.com/artikcloud/artikcloud-java)
-- Console `Sample Program` from [LWM2M C Client SDK](https://github.com/artikcloud/artikcloud-lwm2m-c)
+- [ARTIK Cloud Java SDK ](https://github.com/artikcloud/artikcloud-java)
+- LWM2M Client Simulator from [LWM2M C Client SDK](https://github.com/artikcloud/artikcloud-lwm2m-c)
 - Java >= 7
 
 ## <u>Setup / Installation:</u>
@@ -24,54 +24,34 @@ The TaskRequests will be immediately scheduled to `ARTIK Cloud` and will act on 
 
 **Clone this sample and import project to your IDE**
 
-`%> git clone https://github.com/artikcloud/tutorial-java-deviceManagementLWM2MStarter` 
+`%> git clone https://github.com/artikcloud/tutorial-java-deviceManagementLWM2MStarter`
 
 **Import project and Install ARTIK Cloud Java SDK**
 
-1.  Update the `pom.xml` file with the latest version of ARTIK Cloud Java SDK
+1.  Import the project into your IDE.   If you are using eclipse, import the project as an `existing maven project`.
 
-    ```
-    <dependency>
-      <groupId>cloud.artik</groupId>
-      <artifactId>artikcloud-java</artifactId>
-      <version>2.0.7</version>
-    </dependency>
-    ```
+2.  Install the [ARTIK Cloud Java SDK](https://github.com/artikcloud/artikcloud-java).   Use `maven`, or alternatively download jar file by searching for "artikcloud" at https://search.maven.org/  (ie: `artikcloud-java-2.0.7-jar-with-dependencies.jar` ) and import this jar file to your project.
 
-2. Import the project into your IDE.   If you are using eclipse, import the project as an `existing maven project`.
 
-3. Install the SDK using `maven`.    **Alternatively**, download and install jar file manually by searching for `artikcloud` at `https://search.maven.org/`  and download the latest jar file (ie: `artikcloud-java-2.0.7-jar-with-dependencies.jar` ).   Import this jar file to your project.
+**Update Config.java file**
 
-    If you are using eclipse, you can install the jar file by `Right-Click project —> Properties —> Java Build Path —> Libraries —> Add Jar` .   **Advanced users** may wish to follow instructions to build the SDK directly —  [ARTIK Cloud Java SDK](https://github.com/artikcloud/artikcloud-java)
+Replace with your own Device Id and Device Type Id into the Config.java file.  Additionally add your [User Access Token](https://developer.artik.cloud/documentation/introduction/hello-world.html#step-2-get-an-access-token) to Config.java.   
 
-**Update the Config.java file**
+### Setup the LWM2M Client Simulator
 
-Add your `Device Id`  and `Device Type Id` to the `Config.java` file you retrieved earlier.  Additionally add your `User Access Token` to the `Config.java`.   
+The [ARTIK Cloud LWM2M Client SDK for C]() client simulator is available as a sample program.  Client simulator will be used as a LWM2M device connection to ARTIK Cloud.
 
-*Note: <u>User Access_Token</u>  - The User Access Token is obtained by OAuth2.   For convenience, you can retrieve a temporary user token by logging into the [API-Console](#resources).  After logging in — make any request (ie:  /users/self endpoint) and an `access token` is viewable in the header section*
+1. Build and run the [client simulator](https://github.com/artikcloud/artikcloud-lwm2m-c)
 
-```
-{
-    "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_ACCESS_TOKEN"
-}
-```
-
-### Setup the LWM2M console `sample program`
-
-The `[ARTIK Cloud LWM2M Client SDK for C ` has console `sample program`.   It is a sample console application which will be used to establish a LWM2M device connection to ARTIK Cloud.
-
-1. Build and run the `sample program` using the following instructions:  [ARTIK Cloud LWM2M C SDK](https://github.com/artikcloud/artikcloud-lwm2m-c)
-
-2. Connect your device with the LWM2M `sample program` and supply the `device id` and `device token` as parameters.   **Keep this connection open.**
+2. Connect your device with the LWM2M client simulator and supply the `device id` and `device token` as parameters.   **Keep this connection open**.  The LWM2M client simulator will output to console when it receives a task
 
    ```
    %> akc_client -n -u coaps://coaps-api.artik.cloud:5686 -d YOUR_DEVICE_ID -t YOUR_DEVICE_TOKEN
    ```
 
-3. **The LWM2M `sample progrm` will also output to console when it receives a task.**  Here are a couple commands to familiarize yourself with the `sample program`.
+3. **The LWM2M client simulator will also output to console when it receives a task.**  Here are a couple commands to familiarize yourself with the client simulator.
 
-   To `read` from **Object 3 / Resource 15** which is the <u>timezone property</u> of the device
+   To read from **Object 3 / Resource 15** which is the <u>timezone property</u> of the device
 
    ```
    client%> read /3/0/15
@@ -88,68 +68,9 @@ The `[ARTIK Cloud LWM2M Client SDK for C ` has console `sample program`.   It is
 
 ### Run the sample code:
 
-Run the QuickStartTasks.java file.  
+**Run the QuickStartTasks.java file** which will send a read, write, and execute task.
 
-#### **Learn more about the code:** 
-
-Here we instantiated `DevicesManagementAPI()` and we create 3 `TaskRequests`
-
-```java
-/** ARTIK Cloud DevicesManagementApi */
-DevicesManagementApi devicesManagementApi = new DevicesManagementApi();
-
-/** Here we instantiate 3 TaskRequest instances */
-TaskRequest readDevicePropertiesTask = new TaskRequest();
-TaskRequest writeDeviceTaskRequest = new TaskRequest();
-TaskRequest executeRebootTaskRequest = new TaskRequest();
-```
-
-#### Setup the `TaskRequest`.   
-
-Here we show a setup for `read` `write` and `execute` TaskRequest.
-
-```java
-/** Create the 'read' TaskRequest with the following properties 
-		 * - here we read properties from device to ARTIK Cloud*/
-readDevicePropertiesTask.dtid(Config.DEVICE_TYPE_ID);
-readDevicePropertiesTask.dids(Arrays.asList(Config.DEVICE_IDS));
-readDevicePropertiesTask.taskType("R");
-readDevicePropertiesTask.setProperty("deviceProperties.device");
-
-
-/** Create 'write' TaskRequest with the following properties 
-		 * - here we write to the timezone property */
-writeDeviceTaskRequest.dtid(Config.DEVICE_TYPE_ID);
-writeDeviceTaskRequest.dids(Arrays.asList(Config.DEVICE_IDS));
-writeDeviceTaskRequest.taskType("W");
-writeDeviceTaskRequest.setProperty("deviceProperties.device.timezone");
-writeDeviceTaskRequest.taskParameters(new TaskParameters().value("America/Los_Angeles"));
-
-
-/** Create 'execute' TaskRequet with the following properties 
-		 * - here we execute reboot on the device */
-executeRebootTaskRequest.dtid(Config.DEVICE_TYPE_ID);
-executeRebootTaskRequest.dids(Arrays.asList(Config.DEVICE_IDS));
-executeRebootTaskRequest.taskType("E");
-executeRebootTaskRequest.setProperty("deviceProperties.device.reboot");
-```
-
-#### Send the `TaskRequest` to ARTIK Cloud:
-
-```java
-/** Make the async call for the 3 Tasks we created earlier */
-try {
-  devicesManagementApi.createTasksAsync(readDevicePropertiesTask, taskAsyncCallback);
-  devicesManagementApi.createTasksAsync(writeDeviceTaskRequest, taskAsyncCallback);
-  devicesManagementApi.createTasksAsync(executeRebootTaskRequest, taskAsyncCallback);
-} catch (ApiException e) {
-  e.printStackTrace();
-} catch (Exception e) {
-  e.printStackTrace();
-}
-```
-
-#### Here's a sample response:
+#### Here is a sample response after sending a Task Request.
 
 ```javascript
 //From callback success 
@@ -178,7 +99,7 @@ data: class Task {
 }
 ```
 
-The LWM2M console `sample program` will output to screen when it receives the Task 
+The connected LWM2M Client Simulator will also output to screen once it receives the Task.  Here we see it has received a command to reboot and the /3/0/15 resource has changed
 
 ```
 $ ./akc_client -n -u coaps://coaps-api.artik.cloud:5686 -d yourdeviceid -t yourdevicetoken
@@ -188,9 +109,7 @@ Resource Changed: /3/0/15
 
 #### Task Dashboard
 
-The Task Dashboard is available in the following path: 
-
-`Developer Dashboard —> Device Types (Select Your Device Type) —> Device Management —> Tasks`
+Checkout the Tasks you have called and their statuses within the [Device Type Dashboard](https://developer.artik.cloud/dashboard/devicetypes/)—> [Device Management](https://developer.artik.cloud/dashboard/devicetypes) —> Tasks Dashboard.
 
 **Screenshot:**
 
@@ -199,8 +118,8 @@ The Task Dashboard is available in the following path:
 
 ## More examples
 
-- Peek into [tests](https://github.com/artikcloud/artikcloud-java/tree/master/src/test/java/cloud/artik/api) in `ARTIK Cloud Java SDK` for more device management SDK usage examples.
-- [Devices Management Starter Code](https://github.com/artikcloud/tutorial-java-deviceManagementStarterCode) learn to read and write to `server properties`.
+- Peek into [tests](https://github.com/artikcloud/artikcloud-java/tree/master/src/test/java/cloud/artik/api) in ARTIK Cloud Java SDK for more device management SDK usage examples.
+- [Devices Management Starter Code](https://github.com/artikcloud/tutorial-java-deviceManagementStarterCode) learn to read and write to server properties.
 
 ## Device Management Resources
 
@@ -233,5 +152,4 @@ License and Copyright
 Licensed under the Apache License. See [LICENSE](https://github.com/artikcloud/artikcloud-java/blob/master/LICENSE).
 
 Copyright (c) 2017 Samsung Electronics Co., Ltd.
-
 
