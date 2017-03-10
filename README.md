@@ -44,7 +44,7 @@ The TaskRequests will be immediately scheduled to `ARTIK Cloud` and will act on 
 
     If you are using eclipse, you can install the jar file by `Right-Click project —> Properties —> Java Build Path —> Libraries —> Add Jar` .   **Advanced users** may wish to follow instructions to build the SDK directly —  [ARTIK Cloud Java SDK](https://github.com/artikcloud/artikcloud-java)
 
-**Update the Config.java file **
+**Update the Config.java file**
 
 Add your `Device Id`  and `Device Type Id` to the `Config.java` file you retrieved earlier.  Additionally add your `User Access Token` to the `Config.java`.   
 
@@ -178,7 +178,7 @@ data: class Task {
 }
 ```
 
-The LWM2M console `sample program` will also show some console output
+The LWM2M console `sample program` will output to screen when it receives the Task 
 
 ```
 $ ./akc_client -n -u coaps://coaps-api.artik.cloud:5686 -d yourdeviceid -t yourdevicetoken
