@@ -1,225 +1,217 @@
-## Sample application interacting with <u>**ARTIK Cloud Device Management API**</u>: Create <u>Tasks</u> for connected <u>LWM2M Clients</u>
+## <u>**Device Management API**</u>: Create a Task for <u>lwm2m clients</u>
 
-### <u>Requirements:</u>
-- ARTIK Cloud Java SDK version >= 2.0.7+
-- LWM2M client
-- Java version >= 7
+This sample app will create a  `TaskRequest` to ARTIK Cloud using the `DevicesManagement Task API`. 
 
-### <u>Introduction:</u>
+The TaskRequests will be immediately scheduled to `ARTIK Cloud` and will act on any connected LWM2M clients.
 
-- Overview of ARTIK Cloud <u>Device Management API</u> for creating <u>Tasks</u> with read/write/execute operations.
-- Overview connecting with LWM2M client.
-- Overview interaction between <u>Tasks</u> and <u>LWM2M client.</u>
+## <u>Requirements:</u>
 
-##### **Task / Read**
+- Import to project [ARTIK Cloud Java SDK ](https://github.com/artikcloud/artikcloud-java)
+- Console `Sample Program` from [LWM2M C Client SDK](https://github.com/artikcloud/artikcloud-lwm2m-c)
+- Java >= 7
 
-Sample app creates a Task to <u>read</u> from all device properties of connected LWM2M client.
+## <u>Setup / Installation:</u>
 
-1. Task is scheduled to ARTIK Cloud for processing and all deviceProperties from client are stored in ARTIK Cloud.  
-2. See **Supported Objects and Resources** section below for list of available <u>read</u> operations.
+### Setup at ARTIK Cloud
 
-##### **Task / Write**
+ 1. [Create a device type](https://developer.artik.cloud/documentation/tools/web-tools.html#creating-a-device-type) (or use the one you already own) in the [Developer Dashboard](https://developer.artik.cloud/).   
 
-Sampe app creates a Task to <u>write</u> to a LWM2M connected client.
+ 2. Enable [Device Management Properties](https://developer.artik.cloud/documentation/advanced-features/device-management.html#device-management-in-the-developer-dashboard) for your device type. You do this in the [Device Type Dashboard](https://developer.artik.cloud/dashboard/devicetypes)—> Select Your Device Type —> Select Device Management —> Click "Enable Device Properties".
 
-1. Task is scheduled to ARTIK Cloud for processing and updates value for <u>timezone</u> on both the LWM2M client and ARTIK Cloud deviceProperties.timezone.
-2. See **Supported Objects and Resources** section below for list available <u>write</u> operations.
+ 3. At [My ARTIK Cloud](https://my.artik.cloud/), [Connect a device](https://developer.artik.cloud/documentation/tools/web-tools.html#connecting-a-device) (or use the one you already own) of the device type. Get the [device ID and token](https://developer.artik.cloud/documentation/tools/web-tools.html#managing-a-device-token), which you will need when running the example client later.
 
-##### **Task / Execute**
+### Setup the Java project
 
-Sample app creates a Task to <u>execute</u> on a LWM2M connected client.
+**Clone this sample and import project to your IDE**
 
-1. Task is scheduled to ARTIK Cloud for processing and LWM2M client executes <u>reboot</u> operation.
-2. See **Supported Objects and Resources** section below for list available <u>execute</u> operations.
+`%> git clone https://github.com/artikcloud/tutorial-java-deviceManagementLWM2MStarter` 
 
-### <u>Setup:</u>
+**Import project and Install ARTIK Cloud Java SDK**
 
-- Clone this sample application if you haven't already and setup project in your favorite IDE.
-- Clone and build the [ARTIK Cloud Java SDK](https://github.com/artikcloud/artikcloud-java) and import the libraries into your project.  For convenience, you can also [download the binary jar file](https://search.maven.org).  Search for 'ARTIK Cloud', then download and import (jar-with-dependencies.jar) into your project.  
-- Clone and build LWM2M client application (this sample uses the C client provided below).
-- Follow the <u>Overview</u> instructions provided below.
+1.  Update the `pom.xml` file with the latest version of ARTIK Cloud Java SDK
 
-### <u>Overview:</u>
+    ```
+    <dependency>
+      <groupId>cloud.artik</groupId>
+      <artifactId>artikcloud-java</artifactId>
+      <version>2.0.7</version>
+    </dependency>
+    ```
 
-1. Create a Device Type (or use one you already own) from your [Developer Dashboard](#resources).   Then Enable <u>[Device Management Properties](#resources)</u> for your Device Type.   
+2. Import the project into your IDE.   If you are using eclipse, import the project as an `existing maven project`.
 
-   *Note: You can do this in the [Device Type Dashboard](#resources)—> Select Your Device Type —> Select Device Management —> <u>Enable Device Properties</u>*
+3. Install the SDK using `maven`.    **Alternatively**, download and install jar file manually by searching for `artikcloud` at `https://search.maven.org/`  and download the latest jar file (ie: `artikcloud-java-2.0.7-jar-with-dependencies.jar` ).   Import this jar file to your project.
 
-2. Build the LWM2M Client (this tutorial uses the C client provided below in the reference section) if you haven't already. 
-   *Note: The ARTIK Cloud LWM2M Client is available in the resource section at the bottom of this documentation as well at the build instructions.*
+    If you are using eclipse, you can install the jar file by `Right-Click project —> Properties —> Java Build Path —> Libraries —> Add Jar` .   **Advanced users** may wish to follow instructions to build the SDK directly —  [ARTIK Cloud Java SDK](https://github.com/artikcloud/artikcloud-java)
 
-3. Connect a device (create one, or use one you already own) of the Device Type you enabled earlier.   The device credentials are available to you in the device settings.
+**Update the Config.java file**
 
-4. Using the device credentials obtained in previous step, connect with LWM2M Client.
+Add your `Device Id`  and `Device Type Id` to the `Config.java` file you retrieved earlier.  Additionally add your `User Access Token` to the `Config.java`.   
+
+*Note: <u>User Access_Token</u>  - The User Access Token is obtained by OAuth2.   For convenience, you can retrieve a temporary user token by logging into the [API-Console](#resources).  After logging in — make any request (ie:  /users/self endpoint) and an `access token` is viewable in the header section*
+
+```
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_ACCESS_TOKEN"
+}
+```
+
+### Setup the LWM2M console `sample program`
+
+The `[ARTIK Cloud LWM2M Client SDK for C ` has console `sample program`.   It is a sample console application which will be used to establish a LWM2M device connection to ARTIK Cloud.
+
+1. Build and run the `sample program` using the following instructions:  [ARTIK Cloud LWM2M C SDK](https://github.com/artikcloud/artikcloud-lwm2m-c)
+
+2. Connect your device with the LWM2M `sample program` and supply the `device id` and `device token` as parameters.   **Keep this connection open.**
 
    ```
    %> akc_client -n -u coaps://coaps-api.artik.cloud:5686 -d YOUR_DEVICE_ID -t YOUR_DEVICE_TOKEN
    ```
 
-   #### Here are a few quick commands to familiarize with the LWM2M client.   
+3. **The LWM2M `sample progrm` will also output to console when it receives a task.**  Here are a couple commands to familiarize yourself with the `sample program`.
 
-   Here's a sample format to to read from the device properties.   For example to <u>read</u> from **Object 3 / Resource 2**  —  <u>timezone property</u>.  
+   To `read` from **Object 3 / Resource 15** which is the <u>timezone property</u> of the device
 
    ```
    client%> read /3/0/15
-   URI: /3/0/2 - Value: Pacific/California
+   URI: /3/0/15 - Value: America/Los_Angeles
    ```
 
-   You can update a property in similar fashion
+   You can `write` a property in similar fashion using the `change` command
 
    ```
-   client%> change /3/0/15 Paris/France
+   client%> change /3/0/15 Europe/Paris
    ```
 
-   *See the **Support Objects and Resources** section below* for a full table of <u><u>objects and resources numbers</u>.
+   *Note:  Check out the [LWM2M documentation](https://developer.artik.cloud/documentation/advanced-features/manage-devices-using-lwm2m.html) for more information on object/resources
 
-5. In the sample code - find the Config.java file and fill in the following items:
+### Run the sample code:
 
-   #### Update Config.java file
+Run the QuickStartTasks.java file.  
 
-   1. <u>Device_Type_Id</u> — Device Type with Device Type Property Enabled
+#### **Learn more about the code:** 
 
-   2. <u>Device_Id</u> —  Device Id of your device
+Here we instantiated `DevicesManagementAPI()` and we create 3 `TaskRequests`
 
-   3. <u>Device_Token</u> — Device Token of your device
+```java
+/** ARTIK Cloud DevicesManagementApi */
+DevicesManagementApi devicesManagementApi = new DevicesManagementApi();
 
-      *The <u>Device Id,</u> <u>Device Token</u> and <u>Device Type Id</u> are available in the [User Portal](#resources) —> Device Settings.   Generate the token in the settings page if you haven't already.*
+/** Here we instantiate 3 TaskRequest instances */
+TaskRequest readDevicePropertiesTask = new TaskRequest();
+TaskRequest writeDeviceTaskRequest = new TaskRequest();
+TaskRequest executeRebootTaskRequest = new TaskRequest();
+```
 
-      ​
+#### Setup the `TaskRequest`.   
 
-   4. <u>User_Token</u> — User Token that of user that owns the device.   
+Here we show a setup for `read` `write` and `execute` TaskRequest.
 
-      *The User Access Token is obtained by OAuth2.   For convenience you can retrieve a user token by logging into the [API-Console](#resources).  After logging in — make any request (ie:  /users/self) endpoint and use the Bearer Token shown in the Request Headers:*
-
-      ```
-      {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_ACCESS_TOKEN"
-      }
-      ```
-
-6. Run the sample code by running the QuickStartTasks.java starter file.  The sample application makes a couple Task Requests to ARTIK Cloud for processing.
-
-   #### Here's the sample TaskRequest that was used:
-
-   ```java
-   DevicesManagementApi devicesManagementApi = new DevicesManagementApi();
-   TaskRequest writeDeviceTaskRequest = new TaskRequest();
-   		writeDeviceTaskRequest.dtid(Config.DEVICE_TYPE_ID);
-   		writeDeviceTaskRequest.dids(dids);
-   		writeDeviceTaskRequest.taskType("W");
-   		writeDeviceTaskRequest.setProperty("deviceProperties.device.timezone");
-   		writeDeviceTaskRequest.taskParameters(new TaskParameters().value("Pacific/California"));
-   devicesManagementApi.createTasksAsync(writeDeviceTaskRequest, callback);
-   ```
-
-   #### Here's a sample response after creating a Write operation to update the <u>timezone</u> property.
-
-   ```javascript
-   //From callback success 
-
-   TaskEnvelope:class TaskEnvelope {
-   data: class Task {
-       filter: null
-       taskType: W
-       modifiedOn: 1482279165339
-       dtid: <REDACTED-DEVICE-TYPE-ID>
-       statusCounts: class TaskStatusCounts {
-           numFailed: 0
-           numCancelled: 0
-           totalDevices: 0
-           numCompleted: 0
-           numSucceeded: 0
-       }
-       property: deviceProperties.device.timezone
-       id: <REDACTED-TASK-ID>
-       dids: [<REDACTED-DEVICE-ID>]
-       taskParameters: class TaskParameters {
-           expiresAfter: 604800
-           value: Pacific/California
-       }
-       createdOn: 1482279165339
-       status: REQUESTED
-   }
-   ```
-   ##### Familiarize yourself with the following properties will help you build your TaskRequest:
-
-- <u>taskType</u> - this can be either "R", "W", "E" (i.e.: Read, Write, Execute).    Check more about the resource operations that are available in the [table below](#resources)
-- <u>property</u> - dotted-json-notation string of the device or server property being worked on.
-- <u>taskParameters.value</u> - value to 'set' on the <u>property</u> indicated.   
-- <u>dtid</u> - device type id for device type enabled for device managment.
-- <u>dids</u> - you may pass a list of device id's if you want to apply the task across multiple devices.
-
-### <u>Supported Objects and Resources</u>
-
-Resource table below are provided for convenience.   Check for the latest information from our [LWM2M documentation](https://developer.artik.cloud/documentation/advanced-features/manage-devices-using-lwm2m.html).
-
-#### **<u>Object 3</u>**  —  <u>device</u> resources
-
-| RESO URCE ID | NAME                        | ARTIK CLOUD NAME           | TYPE    | ARTIK CLOUD TYPE | INST ANCES | OPERAT IONS |
-| :----------- | --------------------------- | -------------------------- | ------- | ---------------- | ---------- | ----------- |
-| 0            | Manufacturer                | manufacturer               | String  | String           | Single     | R           |
-| 1            | Model Number                | modelNumber                | String  | String           | Single     | R           |
-| 2            | Serial Number               | serialNumber               | String  | String           | Single     | R           |
-| 3            | Firmware Version            | firmwareVersion            | String  | String           | Single     | R           |
-| 4            | Reboot                      | reboot                     |         |                  | Single     | E           |
-| 5            | Factory Reset               | factoryReset               |         |                  | Single     | E           |
-| 6            | Available Power Sources     | availablePower Sources     | Integer | Long             | Multiple   | R           |
-| 7            | Power Source Voltage        | powerSource Voltage        | Integer | Long             | Multiple   | R           |
-| 8            | Power Source Current        | powerSource Current        | Integer | Long             | Multiple   | R           |
-| 9            | Battery Level               | batteryLevel               | Integer | Long             | Single     | R           |
-| 10           | Memory Free                 | memoryFree                 | Integer | Long             | Single     | R           |
-| 11           | Error Code                  | errorCode                  | Integer | Long             | Multiple   | R           |
-| 12           | Reset Error Code            | resetErrorCode             |         |                  | Single     | E           |
-| 13           | Current Time                | currentTime                | Time    | Long             | Single     | RW          |
-| 14           | UTC Offset                  | utcOffset                  | String  | String           | Single     | RW          |
-| 15           | Timezone                    | timezone                   | String  | String           | Single     | RW          |
-| 16           | Supported Binding and Modes | supported Binding AndModes | String  | String           | Single     | R           |
-| 17           | Device Type                 | deviceType                 | String  | String           | Single     | R           |
-| 18           | Hardware Version            | hardwareVersion            | String  | String           | Single     | R           |
-| 19           | Software Version            | softwareVersion            | String  | String           | Single     | R           |
-| 20           | Battery Status              | batteryStatus              | Integer | Long             | Single     | R           |
-| 21           | Memory Total                | memoryTotal                | Integer | Long             | Single     | R           |
-| 22           | ExtDevInfo                  | *not supported*            |         |                  |            |             |
-
-#### **<u>Object 5</u>** —  <u>firmwareUpdate</u> resources
-
-| RESO URCE ID | NAME                     | ARTIK CLOUD NAME         | TYPE    | ARTIK CLOUD TYPE | INSTANCES | OPERAT IONS |
-| ------------ | ------------------------ | ------------------------ | ------- | ---------------- | --------- | ----------- |
-| 0            | Package                  | *not supported*          |         |                  |           |             |
-| 1            | Package URI              | packageURI               | String  | String           | Single    | W           |
-| 2            | Update                   | update                   |         |                  | Single    | E           |
-| 3            | State                    | state                    | Integer | Long             | Single    | R           |
-| 4            | Update Supported Objects | update Supported Objects | Boolean | Boolean          | Single    | RW          |
-| 5            | Update Result            | updateResult             | Integer | Long             | Single    | R           |
-| 6            | PkgName                  | pkgName                  | String  | String           | Single    | R           |
-| 7            | PkgVersion               | pkgVersion               | String  | String           | Single    | R           |
+```java
+/** Create the 'read' TaskRequest with the following properties 
+		 * - here we read properties from device to ARTIK Cloud*/
+readDevicePropertiesTask.dtid(Config.DEVICE_TYPE_ID);
+readDevicePropertiesTask.dids(Arrays.asList(Config.DEVICE_IDS));
+readDevicePropertiesTask.taskType("R");
+readDevicePropertiesTask.setProperty("deviceProperties.device");
 
 
-### <u>Resources</u>
+/** Create 'write' TaskRequest with the following properties 
+		 * - here we write to the timezone property */
+writeDeviceTaskRequest.dtid(Config.DEVICE_TYPE_ID);
+writeDeviceTaskRequest.dids(Arrays.asList(Config.DEVICE_IDS));
+writeDeviceTaskRequest.taskType("W");
+writeDeviceTaskRequest.setProperty("deviceProperties.device.timezone");
+writeDeviceTaskRequest.taskParameters(new TaskParameters().value("America/Los_Angeles"));
 
-###### Referenced Code Samples / Documentation
 
-| Description                     | Type          | Source                                   |
-| ------------------------------- | ------------- | ---------------------------------------- |
-| ARTIK Cloud LWM2M Client (Java) | Code/  SDK    | https://github.com/artikcloud/artikcloud-lwm2m-java |
-| ARTIK Cloud LWM2M Client (C)    | Code / SDK    | https://github.com/artikcloud/artikcloud-lwm2m-c |
-| ARTIK Cloud SDK                 | Code / SDK    | https://github.com/artikcloud/artikcloud-java |
-| Documentation: LWM2M            | Documentation | https://developer.artik.cloud/documentation/advanced-features/manage-devices-using-lwm2m.html) |
-| Developer Dashboard:            | Dashboard     | https://developer.artik.cloud/dashboard  |
-| User Portal                     | Dashboard     | https://my.artik.cloud                   |
-| API Console                     | API-Console   | https://developer.artik.cloud/api-console/ |
+/** Create 'execute' TaskRequet with the following properties 
+		 * - here we execute reboot on the device */
+executeRebootTaskRequest.dtid(Config.DEVICE_TYPE_ID);
+executeRebootTaskRequest.dids(Arrays.asList(Config.DEVICE_IDS));
+executeRebootTaskRequest.taskType("E");
+executeRebootTaskRequest.setProperty("deviceProperties.device.reboot");
+```
 
-### <u>Dashboards</u>
+#### Send the `TaskRequest` to ARTIK Cloud:
 
-#### **User Portal** - https://my.artik.cloud
+```java
+/** Make the async call for the 3 Tasks we created earlier */
+try {
+  devicesManagementApi.createTasksAsync(readDevicePropertiesTask, taskAsyncCallback);
+  devicesManagementApi.createTasksAsync(writeDeviceTaskRequest, taskAsyncCallback);
+  devicesManagementApi.createTasksAsync(executeRebootTaskRequest, taskAsyncCallback);
+} catch (ApiException e) {
+  e.printStackTrace();
+} catch (Exception e) {
+  e.printStackTrace();
+}
+```
 
-- **User Portal —> Devices**: for adding devices and generating device token
+#### Here's a sample response:
 
-#### **Device Type Dashboard** - https://developer.artik.cloud/dashboard/devicetypes
+```javascript
+//From callback success 
+TaskEnvelope:class TaskEnvelope {
+data: class Task {
+    filter: null
+    taskType: W
+    modifiedOn: 1482279165339
+    dtid: dtabcdef123456789000000
+    statusCounts: class TaskStatusCounts {
+        numFailed: 0
+        numCancelled: 0
+        totalDevices: 0
+        numCompleted: 0
+        numSucceeded: 0
+    }
+    property: deviceProperties.device.timezone
+    id: <REDACTED-TASK-ID>
+    dids: [<REDACTED-DEVICE-ID>]
+    taskParameters: class TaskParameters {
+        expiresAfter: 604800
+        value: America/Los_Angeles
+    }
+    createdOn: 1482279165339
+    status: REQUESTED
+}
+```
 
-- **Device Type —> Device Management —> Properties**:  Enable Server and Device Properties for Device Management
-- **Device Type —> Device Management —> Tasks**:  View Task Status
+The LWM2M console `sample program` will output to screen when it receives the Task 
+
+```
+$ ./akc_client -n -u coaps://coaps-api.artik.cloud:5686 -d yourdeviceid -t yourdevicetoken
+> REBOOT
+Resource Changed: /3/0/15
+```
+
+#### Task Dashboard
+
+The Task Dashboard is available in the following path: 
+
+`Developer Dashboard —> Device Types (Select Your Device Type) —> Device Management —> Tasks`
+
+**Screenshot:**
+
+![Screenshot](./res/screenshot_tasks_dashboard.png)
+
+
+## More examples
+
+- Peek into [tests](https://github.com/artikcloud/artikcloud-java/tree/master/src/test/java/cloud/artik/api) in `ARTIK Cloud Java SDK` for more device management SDK usage examples.
+- [Devices Management Starter Code](https://github.com/artikcloud/tutorial-java-deviceManagementStarterCode) learn to read and write to `server properties`.
+
+## Device Management Resources
+
+[Devices Management Java SDK API](https://github.com/artikcloud/artikcloud-java/blob/master/docs/DevicesManagementApi.md) 
+
+[Devices Management REST API](https://developer.artik.cloud/documentation/api-reference/rest-api.html#device-management)
+
+[Devices Management LWM2M - Java Client](https://github.com/artikcloud/artikcloud-lwm2m-java)
+
+[Devices Management LWM2M - C Client](https://github.com/artikcloud/artikcloud-lwm2m-c)
+
 
 More about ARTIK Cloud
 ----------------------
@@ -234,9 +226,12 @@ To create and manage your services and devices on ARTIK Cloud, create an account
 
 Also see the ARTIK Cloud blog for tutorials, updates, and more: http://artik.io/blog/cloud
 
+
 License and Copyright
 ---------------------
 
 Licensed under the Apache License. See [LICENSE](https://github.com/artikcloud/artikcloud-java/blob/master/LICENSE).
 
 Copyright (c) 2017 Samsung Electronics Co., Ltd.
+
+
